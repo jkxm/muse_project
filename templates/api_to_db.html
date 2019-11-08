@@ -6,5 +6,30 @@
   </head>
   <body>
     api to db
+    <form method="post">
+      <input type="url" name="api_endpoint"/>
+      <input type='submit'/>
+    </form>
+    <table>
+      {% for r in message %}
+      <tr>
+        <td>
+          {{r.name}}
+        </td>
+        <td>
+          {{r.contents | safe}}
+        </td>
+        <td>
+          {{r.locations}}
+        </td>
+        <td>
+          {{r.categories}}
+        </td>
+        <td>
+          {{r.company}}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
   </body>
 </html>

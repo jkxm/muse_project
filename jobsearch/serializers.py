@@ -4,10 +4,10 @@ from jobsearch.models import *
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = '__all__'
+        fields = ['id', 'title', 'company', 'category', 'contents']
 
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = '__all__'
+        fields = ['id', 'name', 'short_name']

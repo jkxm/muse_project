@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from jsonfield import JSONField
+import collections
 
 # Create your models here.
 class Company(models.Model):
@@ -40,19 +42,30 @@ CATEGORY_CHOICES = (
     ('Social Media & Community','Social Media & Community'),
 )
 
+# class Level(models.Model):
+#
+# class Category(models.Model):
+#
+
+
 class Job(models.Model):
     title = models.CharField(max_length=100, blank=False, null=False)
 
     company = models.ForeignKey('Company',null=False)
 
-    level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
+    # level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
+    level = JSONField(default=[], null=True, blank=True)
+    category = JSONField(default=[], null=True, blank=True)
+    location = JSONField(default=[], null=True, blank=True)
 
     # job category
     # what if more than one category?
     # delimit by character? arrayfield? json?
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    # category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
 
     contents = models.TextField(default="")
+
+
 
     def __unicode__(self):
         return self.title
