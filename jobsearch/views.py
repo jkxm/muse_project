@@ -8,13 +8,90 @@ from django.shortcuts import render
 from urllib2 import urlopen
 import urllib2
 import json
+from location_options import *
+# from location_dict import *
 from django.views.decorators.csrf import csrf_exempt
 
 # search view
+LEVEL_CHOICES = (
+    ('Internship', 'Internship'),
+    ('Entry Level', 'Entry Level'),
+    ('Mid Level', 'Mid Level'),
+    ('Senior Level', 'Senior Level'),
+)
+
+CATEGORY_CHOICES = (
+    ('Account Management','Account Management'),
+    ('Business & Strategy','Business & Strategy'),
+    ('Creative & Design','Creative & Design'),
+    ('Customer Service','Customer Service'),
+    ('Data Science','Data Science'),
+    ('Editorial','Editorial'),
+    ('Education','Education'),
+    ('Engineering','Engineering'),
+    ('Finance','Finance'),
+    ('Fundraising & Development','Fundraising & Development'),
+    ('Healthcare & Medicine','Healthcare & Medicine'),
+    ('HR & Recruiting','HR & Recruiting'),
+    ('Legal','Legal'),
+    ('Marketing & PR','Marketing & PR'),
+    ('Operations','Operations'),
+    ('Project & Product Management','Project & Product Management'),
+    ('Retail','Retail'),
+    ('Sales','Sales'),
+    ('Social Media & Community','Social Media & Community'),
+)
+
+def company_datalist_options():
+    options_html = ""
+    for c in Company.objects.all():
+        options_html += "<option value="+str(c.id)+">"+c.name+"</option>"
+
+    return options_html
+
 def search(request):
+    if request.method == "POST":
+        levels = request.POST.getlist('levels')
+        categories = request.POST.getlist('categories')
+        locations = request.POST.get('locations')
+        companies = request.POST.get('companies')
+        job_query = Job.objects.all()
+
+        for l in levels:
+            job_query = job_query.filter(level__contains=l)
+        for c in categories:
+            job_query = job_query.filter(category__contains=c)
+            # job_query = Job.objects.filter(level__contains=levels, category__contains=categories)
+
+        companies_arr = companies.split("__")
+        locations__arr = locations.split("__")
+
+        if companies:
+            for c in companies_arr:
+                comp = Company.objects.get(name=c)
+                job_query = job_query.filter(company = comp)
+
+        for l in locations__arr:
+            job_query = job_query.filter(location__contains=l)
+
+        return render(
+            request,
+            'index.html',
+            {
+                'search_params':(levels, categories, locations, companies),
+                'job_query':job_query,
+                'postdata':request.POST
+            }
+        )
     return render(
         request,
         'index.html',
+        {
+            'level_choices':LEVEL_CHOICES,
+            'category_choices':CATEGORY_CHOICES,
+            'company_choices':company_datalist_options(),
+            'location_options':location_options,
+        }
     )
 
 # API data consumption
@@ -49,13 +126,13 @@ def api_to_db(request):
             # results = response.read()
 
 
-        return render(
-            request,
-            'api_to_db.html',
-            {
-                'message':results
-            }
-        )
+            return render(
+                request,
+                'api_to_db.html',
+                {
+                    'message':results
+                }
+            )
 
     return render(
         request,
@@ -91,5 +168,8 @@ def save_to_db(json_obj):
         company = Company(id=company_id, name=company_name, short_name=company_shortname)
         company.save()
 
+    # save job if doesnt exist
+    # but what if someone is publishing the same job again?
+    # if not Job.objects.filter(title=title,  company=company, level=level, category=category, location=location, contents=contents).exists():
     job = Job(title=title, company=company, level=level, category=category, location=location, contents=contents)
     job.save()

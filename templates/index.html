@@ -3,9 +3,110 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <link href='static/css/jquery.flexdatalist.css' rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="static/js/jquery.flexdatalist.js"></script>
   </head>
   <body>
+
     body
     <a href="../api_to_db"> jkdfa </a>
+    <form method="POST"/>
+    {% csrf_token %}
+      <table>
+      {% for l in level_choices %}
+      <tr>
+        <td>
+          <input type='checkbox' name='levels' value='{{l.0}}'>
+        </td>
+        <td>
+          {{l.0}}
+        </td>
+      </tr>
+      {% endfor %}
+      </table>
+      <table>
+      {% for c in category_choices %}
+      <tr>
+        <td>
+          <input type='checkbox' name='categories' value='{{c.0}}'>
+        </td>
+        <td>
+          {{c.0}}
+        </td>
+      </tr>
+      {% endfor %}
+      </table>
+      <!-- input for multiple companies -->
+      <input type='text'
+       placeholder='Type in company'
+       class='flexdatalist'
+       data-min-length='1'
+       multiple='multiple'
+       list='company'
+       name='companies'>
+       <datalist id="company">
+         {{company_choices | safe}}
+       </datalist>
+
+
+       <!-- input for multiple locations -->
+       <input type='text'
+        placeholder='Type in location'
+        class='flexdatalist'
+        data-min-length='1'
+        multiple='multiple'
+        list='location'
+        name='locations'>
+
+      <datalist id="location">
+        {{location_options | safe}}
+      </datalist>
+
+      <input type='submit'/>
+    </form>
+
+    {% if job_query %}
+      <table>
+        <th>Job Title</th>
+        <th>Company</th>
+        <th>Description</th>
+        <th>Seniority Level</th>
+        <th>Category</th>
+        <th>Location</th>
+      {% for j in job_query %}
+          <tr>
+            <td>
+              {{j.title}}
+            </td>
+            <td>
+                {{j.company.name}}
+            </td>
+
+            <td>
+              {{j.content_snippet |safe}}
+            </td>
+
+            <td>
+              {{j.show_levels}}
+            </td>
+            <td>
+              {{j.show_categories}}
+            </td>
+            <td>
+              {{j.show_locations}}
+            </td>
+
+          </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+
+    <!-- <input type="search" id="country" -->
+    <script>
+      $('.flexdatalist').flexdatalist({
+          minLength: 1,
+      });
+    </script>
   </body>
 </html>

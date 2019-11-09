@@ -65,7 +65,26 @@ class Job(models.Model):
 
     contents = models.TextField(default="")
 
-
-
     def __unicode__(self):
         return self.title
+
+    def show_levels(self):
+        level_str = ""
+        for l in self.level:
+            level_str += l["name"] + ", "
+        return level_str
+
+    def show_locations(self):
+        location_str = ""
+        for l in self.location:
+            location_str += l["name"] + ", "
+        return location_str
+
+    def show_categories(self):
+        category_str = ""
+        for c in self.category:
+            category_str += c["name"] + ", "
+        return category_str
+
+    def content_snippet(self):
+        return self.contents[:100]
