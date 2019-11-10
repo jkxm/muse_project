@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+  <table>
+    <tr>
+      <td>Job Title</td>
+      <td>{{job.title}}</td>
+    </tr>
+    <tr>
+      <td>Company</td>
+      <td>{{job.company.name}}</td>
+    </tr>
+    <tr>
+      <td>Location</td>
+      <td>{{job.show_locations}}</td>
+    </tr>
+    <tr>
+      <td>Description</td>
+      <td>{{job.contents | safe}}</td>
+    </tr>
+    <tr>
+      <td>Experience Level</td>
+      <td>{{job.show_levels}}</td>
+    </tr>
+    <tr>
+      <td>Category</td>
+      <td>{{job.show_categories}}</td>
+    </tr>
+  </table>
+  </body>
+</html>

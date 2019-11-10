@@ -49,6 +49,18 @@ def company_datalist_options():
 
     return options_html
 
+def job_titles():
+    options_html = ""
+    s = set()
+    for j in Job.objects.all():
+        s.add(j.title)
+
+    for title in s:
+        options_html += '<option value="'+ title +'">' + title + '</option>'
+
+    return options_html
+
+
 def search(request):
     if request.method == "POST":
         levels = request.POST.getlist('levels')
@@ -59,6 +71,7 @@ def search(request):
 
         for l in levels:
             job_query = job_query.filter(level__contains=l)
+        # job_query = job_query.filter(level__contains__in=levels)
         for c in categories:
             job_query = job_query.filter(category__contains=c)
             # job_query = Job.objects.filter(level__contains=levels, category__contains=categories)
@@ -91,7 +104,20 @@ def search(request):
             'category_choices':CATEGORY_CHOICES,
             'company_choices':company_datalist_options(),
             'location_options':location_options,
+            'job_titles':job_titles(),
         }
+    )
+
+
+def job_post(request, job_id):
+    job = Job.objects.get(id=job_id)
+    return render(
+        request,
+        'job_post.html',
+        {
+            'job':job,
+        }
+
     )
 
 # API data consumption
@@ -99,29 +125,45 @@ def search(request):
 def api_to_db(request):
 
     if request.method == 'POST':
-        url = request.POST.get('api_endpoint')
-        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-               'Accept-Encoding': 'none',
-               'Accept-Language': 'en-US,en;q=0.8',
-               'Connection': 'keep-alive'
-        }
-        req = urllib2.Request(url, headers=hdr)
+        if 'json_file' in request.FILES:
+            json_file = request.FILES['json_file'].read()
+            # f = open(json_file)
+            data = json.loads(json_file)
+            results = data["results"]
+            for r in results:
+                save_to_db(r)
+            return render(
+                request,
+                'api_to_db.html',
+                {
+                    'message':results
+                }
+            )
 
-        try:
-            response = urllib2.urlopen(req)
-        except urllib2.HTTPError, e:
-            print e.fp.read()
 
-        ri = response.info()
-        # if responseself.
+        else:
+            url = request.POST.get('api_endpoint')
+            hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                   'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                   'Accept-Encoding': 'none',
+                   'Accept-Language': 'en-US,en;q=0.8',
+                   'Connection': 'keep-alive'
+            }
+            req = urllib2.Request(url, headers=hdr)
+
+            try:
+                response = urllib2.urlopen(req)
+            except urllib2.HTTPError, e:
+                print e.fp.read()
+
+            ri = response.info()
+
         if 'application/json' in ri['Content-Type']:
-            # ri = "checked header"
             data = response.read().decode('utf-8')
             output = json.loads(data)
             results = output["results"]
-            for r in output["results"]:
+            for r in results:
                 save_to_db(r)
             # results = response.read()
 

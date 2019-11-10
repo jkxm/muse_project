@@ -8,7 +8,12 @@
     api to db
     <form method="post">
       <input type="url" name="api_endpoint"/>
-      <input type='submit'/>
+      <input type='submit' value='submit url'/>
+    </form>
+
+    <form method ="post" enctype="multipart/form-data">
+      <input type="file" name="json_file" />
+      <input type='submit' value='submit file'/>
     </form>
     <table>
       {% for r in message %}

@@ -9,10 +9,21 @@
   </head>
   <body>
 
-    body
-    <a href="../api_to_db"> jkdfa </a>
-    <form method="POST"/>
-    {% csrf_token %}
+    <!-- body
+    <a href="../api_to_db"> jkdfa </a> -->
+      <form method="POST"/>
+      {% csrf_token %}
+
+      <input type='text'
+       placeholder='Type in company'
+       class='flexdatalist'
+       data-min-length='1'
+
+       list='jobtitle'
+       name='jobtitle'>
+       <datalist id="jobtitle">
+         {{job_titles | safe}}
+       </datalist>
       <table>
       {% for l in level_choices %}
       <tr>
@@ -75,9 +86,12 @@
         <th>Category</th>
         <th>Location</th>
       {% for j in job_query %}
+
           <tr>
             <td>
-              {{j.title}}
+              <a href="../job_post/{{j.id}}" >
+                {{j.title}}
+              </a>
             </td>
             <td>
                 {{j.company.name}}
@@ -98,6 +112,7 @@
             </td>
 
           </tr>
+
       {% endfor %}
       </table>
     {% endif %}
