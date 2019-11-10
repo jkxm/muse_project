@@ -68,7 +68,22 @@ def search(request):
         locations = request.POST.get('locations')
         companies = request.POST.get('companies')
         job_query = Job.objects.all()
+        if request.POST.get('jobtitle'):
+            job_query = Job.objects.filter(title__contains=request.POST.get('jobtitle'))
+            return render(
+                request,
+                'index.html',
+                {
+                    'job_query': job_query,
+                    'level_choices':LEVEL_CHOICES,
+                    'category_choices':CATEGORY_CHOICES,
+                    'company_choices':company_datalist_options(),
+                    'location_options':location_options,
+                    'job_titles':job_titles(),
+                }
+            )
 
+        # fix filter to use OR not AND
         for l in levels:
             job_query = job_query.filter(level__contains=l)
         # job_query = job_query.filter(level__contains__in=levels)
@@ -93,7 +108,11 @@ def search(request):
             {
                 'search_params':(levels, categories, locations, companies),
                 'job_query':job_query,
-                'postdata':request.POST
+                'level_choices':LEVEL_CHOICES,
+                'category_choices':CATEGORY_CHOICES,
+                'company_choices':company_datalist_options(),
+                'location_options':location_options,
+                'job_titles':job_titles(),
             }
         )
     return render(
