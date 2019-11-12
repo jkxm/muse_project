@@ -65,9 +65,10 @@ def search(request):
     if request.method == "POST":
         levels = request.POST.getlist('levels')
         categories = request.POST.getlist('categories')
+        # location and company sent as one input
         locations = request.POST.get('locations')
         companies = request.POST.get('companies')
-        job_query = Job.objects.all()
+        job_query = Job.objects.none()
         if request.POST.get('jobtitle'):
             job_query = Job.objects.filter(title__contains=request.POST.get('jobtitle'))
             return render(
@@ -84,15 +85,20 @@ def search(request):
             )
 
         # fix filter to use OR not AND
+        # use union operator on job query to include all jobs that have selected levels and categories
         for l in levels:
-            job_query = job_query.filter(level__contains=l)
-        # job_query = job_query.filter(level__contains__in=levels)
+            job_query |= Job.objects.filter(level__contains=l)
         for c in categories:
-            job_query = job_query.filter(category__contains=c)
-            # job_query = Job.objects.filter(level__contains=levels, category__contains=categories)
+            job_query |= Job.objects.filter(category__contains=c)
 
+
+        # flexdatalist seperates values with __, so splitting string to get each company/location chosen
         companies_arr = companies.split("__")
         locations__arr = locations.split("__")
+
+        # if there were no levels/ category selected, set job_query to all jobs
+        if not job_query:
+            job_query = Job.objects.all()
 
         if companies:
             for c in companies_arr:
@@ -144,6 +150,7 @@ def job_post(request, job_id):
 def api_to_db(request):
 
     if request.method == 'POST':
+        # if file was provided
         if 'json_file' in request.FILES:
             json_file = request.FILES['json_file'].read()
             # f = open(json_file)
@@ -159,7 +166,7 @@ def api_to_db(request):
                 }
             )
 
-
+        # if endpoint was provided
         else:
             url = request.POST.get('api_endpoint')
             hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',

@@ -1,0 +1,12 @@
+Django==1.11.26
+djangorestframework==3.9.4
+jsonfield==2.0.2
+pbr==5.4.3
+pkg-resources==0.0.0
+Pygments==2.4.2
+pytz==2019.3
+six==1.13.0
+stevedore==1.31.0
+virtualenv==16.7.7
+virtualenv-clone==0.5.3
+virtualenvwrapper==4.8.4
