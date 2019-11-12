@@ -12,7 +12,6 @@
 
       <form method="POST"/>
       {% csrf_token %}
-
       <input type='text'
        placeholder='Search by job title'
        class='flexdatalist'
@@ -130,6 +129,7 @@
       </table>
 
       {% else %}
+
       <p>No jobs match search query</p>
 
     {% endif %}

@@ -68,7 +68,7 @@ def search(request):
         # location and company sent as one input
         locations = request.POST.get('locations')
         companies = request.POST.get('companies')
-        job_query = Job.objects.none()
+        first_query = Job.objects.none()
         if request.POST.get('jobtitle'):
             job_query = Job.objects.filter(title__contains=request.POST.get('jobtitle'))
             return render(
@@ -88,35 +88,54 @@ def search(request):
         # use union operator on job query to include all jobs that have selected levels and categories
         if levels:
             for l in levels:
-                job_query |= Job.objects.filter(level__contains=l)
+                first_query |= Job.objects.filter(level__contains=l)
         if categories:
             for c in categories:
-                job_query |= Job.objects.filter(category__contains=c)
+                first_query |= Job.objects.filter(category__contains=c)
 
 
-        # flexdatalist seperates values with __, so splitting string to get each company/location chosen
-        companies_arr = companies.split("__")
-        locations__arr = locations.split("__")
+
+
+
 
         # if there were no levels/ category selected, set job_query to all jobs
         # if not job_query:
         #     job_query = Job.objects.all()
+        second_query = Job.objects.none()
+        third_query = Job.objects.none()
+        # using and operator
 
+
+        # flexdatalist seperates values with __, so splitting string to get each company/location chosen
         if companies:
+            companies_arr = companies.split("__")
             for c in companies_arr:
                 comp = Company.objects.get(name=c)
-                job_query |= Job.objects.filter(company = comp)
+                second_query |= Job.objects.filter(company = comp)
                 # job_query = job_query.filter(company = comp)
         if locations:
+            locations__arr = locations.split("__")
             for l in locations__arr:
-                job_query |= Job.objects.filter(location__contains=l)
+                # second_query |= Job.objects.filter(location__contains=l)
+                third_query |= Job.objects.filter(location__contains=l)
                 # job_query = job_query.filter(location__contains=l)
+
+
+        if not first_query:
+            first_query = Job.objects.all()
+        if not second_query:
+            second_query = Job.objects.all()
+        if not third_query:
+            third_query = Job.objects.all()
+
+        job_query = first_query & second_query & third_query
+        # job_query = job_query & third_query
 
         return render(
             request,
             'index.html',
             {
-                'search_params':(levels, categories, locations, companies),
+                'search_params':(levels, categories, locations, companies, first_query, second_query, third_query),
                 'job_query':job_query,
                 'level_choices':LEVEL_CHOICES,
                 'category_choices':CATEGORY_CHOICES,
@@ -134,6 +153,7 @@ def search(request):
             'company_choices':company_datalist_options(),
             'location_options':location_options,
             'job_titles':job_titles(),
+            'job_query':Job.objects.all(),
         }
     )
 
