@@ -178,29 +178,32 @@ def api_to_db(request):
             }
             req = urllib2.Request(url, headers=hdr)
 
+
             try:
                 response = urllib2.urlopen(req)
+                # if 'application/json' in ri['Content-Type']:
+                data = response.read().decode('utf-8')
+                output = json.loads(data)
+                results = output["results"]
+                for r in results:
+                    save_to_db(r)
+                # results = response.read()
+
+
+                return render(
+                    request,
+                    'api_to_db.html',
+                    {
+                        'message':results,
+                        'jobs':len(results),
+                    }
+                )
             except urllib2.HTTPError, e:
                 print e.fp.read()
 
-            ri = response.info()
-
-        if 'application/json' in ri['Content-Type']:
-            data = response.read().decode('utf-8')
-            output = json.loads(data)
-            results = output["results"]
-            for r in results:
-                save_to_db(r)
-            # results = response.read()
+            # ri = response.info()
 
 
-            return render(
-                request,
-                'api_to_db.html',
-                {
-                    'message':results
-                }
-            )
 
     return render(
         request,

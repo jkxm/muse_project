@@ -16,6 +16,9 @@
       <input type='submit' value='submit file'/>
     </form>
     <table>
+      {% if message %}
+      <p> Added {{jobs}} jobs to DB </P>
+      {% endif %}
       {% for r in message %}
       <tr>
         <td>
