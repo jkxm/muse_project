@@ -43,6 +43,7 @@ CATEGORY_CHOICES = (
 )
 
 def company_datalist_options():
+    # return all companies in db
     options_html = ""
     for c in Company.objects.all():
         options_html += "<option value="+str(c.id)+">"+c.name+"</option>"
@@ -50,6 +51,7 @@ def company_datalist_options():
     return options_html
 
 def job_titles():
+    # return options of existing jobtitles
     options_html = ""
     s = set()
     for j in Job.objects.all():
@@ -65,10 +67,14 @@ def search(request):
     if request.method == "POST":
         levels = request.POST.getlist('levels')
         categories = request.POST.getlist('categories')
+
         # location and company sent as one input
         locations = request.POST.get('locations')
         companies = request.POST.get('companies')
+
         first_query = Job.objects.none()
+        second_query = Job.objects.none()
+        third_query = Job.objects.none()
         if request.POST.get('jobtitle'):
             job_query = Job.objects.filter(title__contains=request.POST.get('jobtitle'))
             return render(
@@ -84,8 +90,7 @@ def search(request):
                 }
             )
 
-        # fix filter to use OR not AND
-        # use union operator on job query to include all jobs that have selected levels and categories
+        # use union operator on first_query to include all jobs that have selected levels and categories
         if levels:
             for l in levels:
                 first_query |= Job.objects.filter(level__contains=l)
@@ -93,20 +98,11 @@ def search(request):
             for c in categories:
                 first_query |= Job.objects.filter(category__contains=c)
 
-
-
-
-
-
-        # if there were no levels/ category selected, set job_query to all jobs
-        # if not job_query:
-        #     job_query = Job.objects.all()
-        second_query = Job.objects.none()
-        third_query = Job.objects.none()
-        # using and operator
-
-
         # flexdatalist seperates values with __, so splitting string to get each company/location chosen
+        # companies and locations are stored in their own variable.
+        # I think as a job seeker, I would like to use the selected filters to narrow down my choices as much as possible
+        # therefore, I choose to intersect all queries to produce a queryset that only contains jobs that match the parameters im looking for
+
         if companies:
             companies_arr = companies.split("__")
             for c in companies_arr:
@@ -120,6 +116,9 @@ def search(request):
                 third_query |= Job.objects.filter(location__contains=l)
                 # job_query = job_query.filter(location__contains=l)
 
+
+        # if certain parameters werent selected at all, change the queryset to contain all jobs
+        # this way, the parameters that were set intersect with all jobs
 
         if not first_query:
             first_query = Job.objects.all()
