@@ -4,18 +4,17 @@
     <meta charset="utf-8">
     <title></title>
     <link href='static/css/jquery.flexdatalist.css' rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="static/js/jquery.flexdatalist.js"></script>
   </head>
   <body>
 
-    <!-- body
-    <a href="../api_to_db"> jkdfa </a> -->
       <form method="POST"/>
       {% csrf_token %}
 
       <input type='text'
-       placeholder='Type in company'
+       placeholder='Search by job title'
        class='flexdatalist'
        data-min-length='1'
 
@@ -24,30 +23,44 @@
        <datalist id="jobtitle">
          {{job_titles | safe}}
        </datalist>
-      <table>
-      {% for l in level_choices %}
-      <tr>
-        <td>
-          <input type='checkbox' name='levels' value='{{l.0}}'>
-        </td>
-        <td>
-          {{l.0}}
-        </td>
-      </tr>
-      {% endfor %}
-      </table>
-      <table>
-      {% for c in category_choices %}
-      <tr>
-        <td>
-          <input type='checkbox' name='categories' value='{{c.0}}'>
-        </td>
-        <td>
-          {{c.0}}
-        </td>
-      </tr>
-      {% endfor %}
-      </table>
+
+       <!-- click dropdown for level -->
+       <div class="w3-dropdown-click">
+         <button type='button' onClick="displayChoices('levels')" class="w3-button w3-black">Experience Level</button>
+         <div id="levels" class="w3-dropdown-content w3-bar-block w3-border">
+            <table>
+            {% for l in level_choices %}
+            <tr>
+              <td>
+                <input type='checkbox' name='levels' value='{{l.0}}'>
+              </td>
+              <td>
+                {{l.0}}
+              </td>
+            </tr>
+            {% endfor %}
+            </table>
+          </div>
+      </div>
+
+      <!-- click dropdown for category -->
+      <div class="w3-dropdown-click">
+        <button type='button' onClick="displayChoices('categories')" class="w3-button w3-black">Job Categories</button>
+        <div id="categories" class="w3-dropdown-content w3-bar-block w3-border">
+          <table>
+          {% for c in category_choices %}
+          <tr>
+            <td>
+              <input type='checkbox' name='categories' value='{{c.0}}'>
+            </td>
+            <td>
+              {{c.0}}
+            </td>
+          </tr>
+          {% endfor %}
+          </table>
+          </div>
+      </div>
       <!-- input for multiple companies -->
       <input type='text'
        placeholder='Type in company'
@@ -115,6 +128,10 @@
 
       {% endfor %}
       </table>
+
+      {% else %}
+      <p>No jobs match search query</p>
+
     {% endif %}
 
     <!-- <input type="search" id="country" -->
@@ -122,6 +139,16 @@
       $('.flexdatalist').flexdatalist({
           minLength: 1,
       });
+
+
+    function displayChoices(element) {
+      var x = document.getElementById(element);
+      if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+      } else {
+        x.className = x.className.replace(" w3-show", "");
+      }
+    }
     </script>
   </body>
 </html>

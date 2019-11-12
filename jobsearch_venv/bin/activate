@@ -40,7 +40,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/mnt/c/Users/justi/Desktop/project/jobsearch_venv"
+VIRTUAL_ENV="/home/justink/Desktop/project/muse-project/jobsearch_venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

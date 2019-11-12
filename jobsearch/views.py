@@ -86,10 +86,12 @@ def search(request):
 
         # fix filter to use OR not AND
         # use union operator on job query to include all jobs that have selected levels and categories
-        for l in levels:
-            job_query |= Job.objects.filter(level__contains=l)
-        for c in categories:
-            job_query |= Job.objects.filter(category__contains=c)
+        if levels:
+            for l in levels:
+                job_query |= Job.objects.filter(level__contains=l)
+        if categories:
+            for c in categories:
+                job_query |= Job.objects.filter(category__contains=c)
 
 
         # flexdatalist seperates values with __, so splitting string to get each company/location chosen
@@ -97,16 +99,18 @@ def search(request):
         locations__arr = locations.split("__")
 
         # if there were no levels/ category selected, set job_query to all jobs
-        if not job_query:
-            job_query = Job.objects.all()
+        # if not job_query:
+        #     job_query = Job.objects.all()
 
         if companies:
             for c in companies_arr:
                 comp = Company.objects.get(name=c)
-                job_query = job_query.filter(company = comp)
-
-        for l in locations__arr:
-            job_query = job_query.filter(location__contains=l)
+                job_query |= Job.objects.filter(company = comp)
+                # job_query = job_query.filter(company = comp)
+        if locations:
+            for l in locations__arr:
+                job_query |= Job.objects.filter(location__contains=l)
+                # job_query = job_query.filter(location__contains=l)
 
         return render(
             request,

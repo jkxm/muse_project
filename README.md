@@ -1,4 +1,4 @@
-##Introduction
+## Introduction
 
 This is my job search web application for the muse.
 
@@ -7,7 +7,7 @@ The second is to convert json files into model objects and save them into the da
 
 Database filled with jobs from the Muse API
 
-##To run application:
+## To run application:
 
 Please cd into the project folder and install the packages that I used for this application with the following commands
 
@@ -25,6 +25,7 @@ Job search application is found through http://127.0.0.1:8000/
 The API to database view is found through http://127.0.0.1:8000/api_to_db/
 
 
-##Built With
+## Built With
 Django
 Flexdatalist
+W3 CSS
