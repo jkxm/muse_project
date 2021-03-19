@@ -1,5 +1,5 @@
 Django==1.11.26
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 jsonfield==2.0.2
 pbr==5.4.3
 Pygments==2.4.2
