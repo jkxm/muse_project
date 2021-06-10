@@ -1,4 +1,4 @@
-Django==1.11.26
+Django==2.2.24
 djangorestframework==3.9.4
 jsonfield==2.0.2
 pbr==5.4.3
